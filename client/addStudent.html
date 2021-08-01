@@ -1,0 +1,103 @@
+<html>
+
+    <head>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+         integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+         <link rel="stylesheet" type="text/css" href="./css/stylesheet.css">
+
+
+    </head>
+   
+    <div class="header">
+        <div class="logo"><img src="misrad.png" alt="misrad" width="130px" height = " 130px" class="img" ></div>
+    
+        <div class="inner_header">
+            <div class="txt"><h1>Students List</h1></div>
+    
+            <ul class="navigation">
+                <a><li onclick="redirect()">Add Student
+                </li></a>
+    
+                <a><li onclick="redirecthome()">Home
+                </li></a>
+    
+            </ul>
+    
+        </div>
+    </div>
+
+
+<br><br><br>
+<h2><b>Enter Your Student's Info</b></h2>
+<body>
+    
+    
+        <label for="name">Name:</label>
+        <input type="text" id="name" placeholder="Name"></br>
+    
+        <label for="name">Email:</label>
+         <input type="text" id="email" placeholder="Email"></br>
+    
+        <label for="name">Faculty:</label>
+        <input type="text" id="faculty" placeholder="Faculty"></br>
+    
+        <label for="name">Birth Date:</label>
+        <input type="text" id="birth" placeholder="Birth Date"></br><br>    
+    
+        <input type="button" id="add" value="Add Student" class="btn btn-dark" onclick="add()"> 
+      
+    
+
+
+    <script>
+        
+        
+        var add = async()=>{
+            var resp = await fetch("http://localhost:8000/students")
+
+            var newStudent={
+        fullName : document.getElementById("name").value,
+        faculty : document.getElementById("faculty").value,
+        birthDate : document.getElementById("birth").value,
+        email : document.getElementById("email").value,
+        grades :[] 
+        
+        }
+        if(newStudent.fullName != "" && newStudent.faculty != "" && newStudent.birthDate != "" && newStudent.email != ""){
+            if(resp.ok == true){
+                var fetchParams = {
+                method:'post',
+                body:JSON.stringify(newStudent),
+                headers:{"Content-type":"application/json"}
+            }
+            fetch(`http://localhost:8000/students`,fetchParams)
+            console.log(newStudent);
+            window.location.href="client.html"
+
+        }
+    } else {
+        alert("Fill in all of the fields")
+
+    }
+    }
+
+    function redirect (id){
+
+window.location.href="addStudent.html"
+}
+
+function redirecthome (){
+
+window.location.href="client.html"
+}             
+        
+
+        
+
+
+
+    </script>
+</body>
+</html>

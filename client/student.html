@@ -1,0 +1,89 @@
+<html>
+
+    <head>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+         integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+         <link rel="stylesheet" type="text/css" href="./css/stylesheet.css">
+
+    </head>
+
+
+    <body onload="loadData()">
+
+      
+            <div class="header">
+                <div class="logo"><img src="misrad.png" alt="misrad" width="130px" height = " 130px" class="img" ></div>
+            
+                <div class="inner_header">
+                    <div class="txt"><h1>Students Info</h1></div>
+            
+                    <ul class="navigation">
+                         <a><li onclick="redirect()">Add Student
+                        </li></a>
+    
+                         <a><li onclick="redirecthome()">Home
+                        </li></a>
+    
+                      
+                    </ul>
+            
+                </div>
+            </div>
+        
+
+       
+        <table class="table table-striped" border="1" id="table">
+
+            <tr>
+                <th>Name</th>
+                <th>Faculty</th>
+                <th>Birth Date</th>
+                <th>Email</th>
+            </tr>
+    
+        </table><br>
+        
+        <script>
+
+
+var loadData=async()=>{ 
+            var currentId = sessionStorage.getItem("id")
+            var tableObj = document.getElementById("table")
+
+            var resp = await fetch(`http://localhost:8000/students/${currentId}`)
+            if(resp.ok == true){
+                var student = await resp.json()
+              
+            var trObj = document.createElement("tr");
+            var nameObj = document.createElement("td");
+            var facObj = document.createElement("td");
+            var emailObj = document.createElement("td");
+            var birthObj = document.createElement("td");
+
+            nameObj.innerHTML = student.fullName
+            facObj.innerHTML = student.faculty
+            emailObj.innerHTML = student.email
+            birthObj.innerHTML =  student.birthDate.slice(0,10)
+
+            trObj.appendChild(nameObj);
+            trObj.appendChild(facObj);
+            trObj.appendChild(birthObj);
+            trObj.appendChild(emailObj);
+            tableObj.appendChild(trObj);
+            }
+        }
+
+        function redirect (id){
+
+        window.location.href="addStudent.html"
+        }
+
+        function redirecthome (){
+
+        window.location.href="client.html"
+        }   
+
+        </script>
+    </body>
+</html>

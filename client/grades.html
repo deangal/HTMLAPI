@@ -1,0 +1,254 @@
+<html>
+
+    <head>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+         integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+         <link rel="stylesheet" type="text/css" href="./css/stylesheet.css">
+
+
+    </head>
+
+
+<body onload="loadData()">
+    
+    <div id= "right">
+        
+
+        <div class="header">
+            <div class="logo"><img src="misrad.png" alt="misrad" width="130px" height = " 130px" class="img" ></div>
+        
+            <div class="inner_header">
+                <div class="txt"><h1>Student Grades</h1>
+                </div>
+        
+                <ul class="navigation">
+                    <a><li onclick="redirect()">Add Student
+                    </li></a>
+        
+                    <a><li onclick="redirecthome()">Home
+                    </li></a>
+        
+                </ul>
+        
+            </div>
+        </div>
+    </div>
+
+    <table  class="table table-striped" border="1" id="table">
+        <tr>
+            <th>Date</th>
+            <th>Grade</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+    
+    
+    </table><br><br><br>
+    <b>Grade:</b><input type="text" id="grade"><br>
+    <b>Exam Date:</b><input type="date"  id="date"><br>
+    <input type="button" id="add" value="Add" class="btn btn-dark" onclick="addGrade()"> 
+    <input type="button" id="update" value="Update" class="btn btn-dark" onclick="updateGrade()">
+    
+
+
+
+    <script>
+
+
+
+var loadData=async()=>{ 
+            var currentId = sessionStorage.getItem("id")
+            var tableObj = document.getElementById("table")
+            var gradeId = ""
+
+            var resp = await fetch(`http://localhost:8000/students/${currentId}`)
+            if(resp.ok == true){
+                var student = await resp.json()
+
+               if(student.grades != null){
+                student.grades.forEach(grades => {
+                var trObj = document.createElement("tr");
+                var dateObj = document.createElement("td");
+                var gradeObj = document.createElement("td");
+                var btnObj = document.createElement("td");
+                var deleteObj = document.createElement("td");
+
+
+                dateObj.id = `${grades.examDate}`
+                gradeObj.id = `${grades._id}`
+
+                var updateButton = document.createElement("input");
+                var deleteButton = document.createElement("input");
+ 
+                dateObj.innerHTML  = grades.examDate.slice(0,10);
+                gradeObj.innerHTML = grades.grade;
+
+                updateButton.type = "button"
+                updateButton.value = "Copy"
+                updateButton.onclick = ()=>{
+                copy(gradeObj.id,dateObj.id)
+                }
+
+                deleteButton.type = "button"
+                deleteButton.value = "Delete"
+                deleteButton.onclick = ()=>{
+                del()
+                }
+
+            
+                trObj.appendChild(dateObj);
+                trObj.appendChild(gradeObj);
+                trObj.appendChild(btnObj)
+                trObj.appendChild(deleteObj)
+                
+                btnObj.appendChild(updateButton)
+                deleteObj.appendChild(deleteButton)
+
+
+                tableObj.appendChild(trObj);
+            })
+            }
+            }
+        }
+            
+
+
+            var addGrade = async() => {
+                var currentId = sessionStorage.getItem("id")
+                var resp = await fetch(`http://localhost:8000/students/${currentId}`)
+               
+                
+
+            
+            if(resp.ok == true){
+                var student = await resp.json()
+                console.log(student);
+                
+                var newGrade = {
+                grade : document.getElementById("grade").value,
+                examDate : document.getElementById("date").value.slice(0,10),
+              
+            }
+
+            
+                if(student.grades != null){
+                student.grades.push(newGrade)
+
+            } else {
+                student.grades = newGrade
+            }
+             
+           
+           
+            console.log(newGrade.examDate);
+            if(newGrade.examDate != "" && newGrade.grade != ""){
+                var fetchParams = {
+                method:'put',
+                body:JSON.stringify(student),
+                headers:{"Content-type":"application/json"}
+            }
+            fetch(`http://localhost:8000/students/${currentId}`,fetchParams)
+            console.log(student);
+            window.location.href="grades.html"
+
+        }else{
+                alert("Fill in all of the fields")
+        }
+    }
+                
+            }
+
+
+
+            
+            var updateGrade = async() => {
+                var currentId = sessionStorage.getItem("id")
+                var resp = await fetch(`http://localhost:8000/students/${currentId}`)
+                
+            if(resp.ok == true){
+                var student = await resp.json()
+                
+                var newGrade = {
+                
+                grade : document.getElementById("grade").value,
+                examDate : document.getElementById("date").value
+            }
+                var gradeId = sessionStorage.getItem("gradeId")
+                var index = student.grades.findIndex((elemnt) => elemnt._id ==  gradeId )
+
+               student.grades[index] = newGrade
+
+               
+               if(newGrade.examDate != "" && newGrade.grade != ""){
+                var fetchParams = {
+                method:'put',
+                body:JSON.stringify(student),
+                headers:{"Content-type":"application/json"}
+            }
+            fetch(`http://localhost:8000/students/${currentId}`,fetchParams)
+            window.location.href="grades.html"
+
+        }else{
+                alert("Fill in all of the fields")
+        }
+    }
+                
+            }
+
+            var del = async()=>{
+                var currentId = sessionStorage.getItem("id")
+                var resp = await fetch(`http://localhost:8000/students/${currentId}`)
+
+                if(resp.ok == true){
+                var student = await resp.json()
+
+                var gradeId = sessionStorage.getItem("gradeId")
+                var index = student.grades.findIndex((elemnt) => elemnt._id ==  gradeId )
+                student.grades.splice(index,1)
+
+                var fetchParams = {
+                method:'put',
+                body:JSON.stringify(student),
+                headers:{"Content-type":"application/json"}
+            }
+            fetch(`http://localhost:8000/students/${currentId}`,fetchParams)
+            window.location.href="grades.html"
+
+                }
+        }
+
+
+
+
+            var copy = async(grades_id,dateObj_id)=>{
+                var currentId = sessionStorage.getItem("id")
+                var resp = await fetch(`http://localhost:8000/students/${currentId}`)
+                
+                gradeId = sessionStorage.setItem("gradeId",grades_id)
+                var dateObj = dateObj_id.slice(0,10)
+                var gradeObj = document.getElementById(`${grades_id}`).innerHTML
+
+                
+                document.getElementById("date").value = dateObj
+                document.getElementById("grade").value =  gradeObj
+
+                console.log(dateObj_id);
+
+            } 
+
+            function redirect (id){
+
+            window.location.href="addStudent.html"
+            }
+
+            function redirecthome (){
+
+            window.location.href="client.html"
+            }
+
+
+    </script>
+</body>
+</html>

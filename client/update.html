@@ -1,0 +1,108 @@
+<html>
+
+    <head>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+         integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+         <link rel="stylesheet" type="text/css" href="./css/stylesheet.css">
+
+
+    </head>
+
+
+<body onload="loadData()">
+
+    <div class="header">
+        <div class="logo"><img src="misrad.png" alt="misrad" width="130px" height = " 130px" class="img" ></div>
+    
+        <div class="inner_header">
+            <div class="txt"><h1>Info Update</h1>></div>
+    
+            <ul class="navigation">
+                <a><li onclick="redirect()">Add Student
+                </li></a>
+    
+                <a><li onclick="redirecthome()">Home
+                </li></a>
+    
+                
+            </ul>
+    
+        </div>
+    </div>
+
+    <br><br><br>
+
+
+
+<form class="form" >
+    
+    <label for="name">Name:</label>
+    <input type="text" id="name" placeholder="Name"></br>
+
+    <label for="name">Email:</label>
+     <input type="text" id="email" placeholder="Email"></br>
+
+    <label for="name">Faculty:</label>
+    <input type="text" id="faculty" placeholder="Faculty"></br>
+
+    <label for="name">Birth Date:</label>
+    <input type="text" id="birth" placeholder="Birth Date"></br>
+
+    <input type="button" value="Update" class="btn btn-dark" onclick="updateData()">
+</form>
+        
+    <script>
+        var gradesObj = [] 
+        var loadData=async()=>{ 
+            var currentId = sessionStorage.getItem("id")
+            var resp = await fetch(`http://localhost:8000/students/${currentId}`)
+            if(resp.ok == true){
+                var students = await resp.json()
+                var newName = document.getElementById("name").value = students.fullName
+                var newEmail = document.getElementById("email").value = students.email
+                var newFac = document.getElementById("faculty").value = students.faculty
+                var newBirth = document.getElementById("birth").value = students.birthDate.slice(0,10)
+                gradesObj = students.grades
+
+            }
+        }
+        var updateData=()=>{
+            
+            var currentId = sessionStorage.getItem("id")
+            var updateObject = {
+                fullName:document.getElementById("name").value,
+                email: document.getElementById("email").value ,
+                faculty:document.getElementById("faculty").value,
+                birthDate:document.getElementById("birth").value, 
+                grades: gradesObj
+            }
+
+            var fetchParams = {
+                method:'put',
+                body:JSON.stringify(updateObject),
+                headers:{"Content-type":"application/json"}
+            }
+            fetch(`http://localhost:8000/students/${currentId}`,fetchParams)
+            window.location.href="client.html"
+
+        }
+
+
+        function redirect (id){
+
+        window.location.href="addStudent.html"
+        }
+
+        function redirecthome (){
+
+        window.location.href="client.html"
+        }
+    </script>
+</body>
+
+
+
+
+</html>
